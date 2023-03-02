@@ -214,7 +214,7 @@ async def imdb_callback(bot: Client, query: CallbackQuery):
 @Client.on_message(filters.command(["dl"]))
 async def tnlink_(client, message):
     try:
-        link = message.text.split(" ", 1)[0]
+        link = message.text.split(" ", 1)[1]
     except IndexError:
         return await message.reply_text("Invalid format")
     try:
