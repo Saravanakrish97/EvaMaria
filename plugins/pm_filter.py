@@ -71,9 +71,8 @@ async def gie_filter(client,message):
                 break 
 
     else:
-        await auto_filter(client, message)   
-        return await asyncio.sleep(10) 
-        await message.delete()
+        await auto_filter(client, message)
+        return await asyncio.sleep(10)
 
 @Client.on_message(filters.group & filters.text & ~filters.edited & filters.incoming)
 async def give_filter(client,message):
@@ -118,9 +117,8 @@ async def give_filter(client,message):
                 break 
 
     else:
-        await auto_filter(client, message)   
-        return await asyncio.sleep(10) 
-        await message.delete()
+        await auto_filter(client, message)
+        return await asyncio.sleep(10)
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
@@ -176,17 +174,42 @@ async def next_page(bot, query):
         off_set = offset - 10
     if n_offset == 0:
         btn.append(
-            [InlineKeyboardButton("⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"), InlineKeyboardButton(f"📃 Pages {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages")]
+            [
+                InlineKeyboardButton(
+                    "⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"
+                ),
+                InlineKeyboardButton(
+                    f"📃 Pages {round(offset / 10) + 1} / {round(total / 10)}",
+                    callback_data="pages",
+                ),
+            ]
         )
     elif off_set is None:
-        btn.append([InlineKeyboardButton(f"🗓 {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages"), InlineKeyboardButton("NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}")])
+        btn.append(
+            [
+                InlineKeyboardButton(
+                    f"🗓 {round(offset / 10) + 1} / {round(total / 10)}",
+                    callback_data="pages",
+                ),
+                InlineKeyboardButton(
+                    "NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}"
+                ),
+            ]
+        )
     else:
         btn.append(
             [
-                InlineKeyboardButton("⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"),
-                InlineKeyboardButton(f"🗓 {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages"),
-                InlineKeyboardButton("NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}")
-            ],
+                InlineKeyboardButton(
+                    "⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"
+                ),
+                InlineKeyboardButton(
+                    f"🗓 {round(offset / 10) + 1} / {round(total / 10)}",
+                    callback_data="pages",
+                ),
+                InlineKeyboardButton(
+                    "NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}"
+                ),
+            ]
         )
     try:
         await query.edit_message_reply_markup( 
@@ -281,7 +304,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.answer()
 
         group_id = query.data.split(":")[1]
-        
+
         act = query.data.split(":")[2]
         hr = await client.get_chat(int(group_id))
         title = hr.title
@@ -347,10 +370,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 parse_mode="md"
             )
         else:
-            await query.message.edit_text(
-                f"Some error occured!!",
-                parse_mode="md"
-            )
+            await query.message.edit_text("Some error occured!!", parse_mode="md")
         return
     elif "deletecb" in query.data:
         await query.answer()
@@ -365,10 +385,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 "Successfully deleted connection"
             )
         else:
-            await query.message.edit_text(
-                f"Some error occured!!",
-                parse_mode="md"
-            )
+            await query.message.edit_text("Some error occured!!", parse_mode="md")
         return
     elif query.data == "backcb":
         await query.answer()
@@ -431,7 +448,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             f_caption=f_caption
         if f_caption is None:
             f_caption = f"{files.file_name}"
-                 
+
         try:
             if AUTH_CHANNEL and not await is_subscribed(client, query):
                 await query.answer(url=f"https://t.me/{temp.U_NAME}?start={file_id}")
@@ -645,16 +662,15 @@ async def auto_filter(client, msg, spoll=False):
         message = msg
         if re.findall("((^\/|^,|^!|^\.|^[\U0001F600-\U000E007F]).*)", message.text):
             return
-        if 2 < len(message.text) < 100:
-            search = message.text
-            files, offset, total_results = await get_search_results(search.lower(), offset=0, filter=True)
-            if not files:
-                if SPELL_CHECK_REPLY:
-                    return await advantage_spell_chok(msg)
-                else:
-                    return
-        else:
+        if not 2 < len(message.text) < 100:
             return
+        search = message.text
+        files, offset, total_results = await get_search_results(search.lower(), offset=0, filter=True)
+        if not files:
+            if SPELL_CHECK_REPLY:
+                return await advantage_spell_chok(msg)
+            else:
+                return
     else:
         message = msg.message.reply_to_message # msg will be callback query
         search, files, offset, total_results = spoll
@@ -757,7 +773,7 @@ async def auto_filter(client, msg, spoll=False):
 
 async def advantage_spell_chok(msg):
     query = re.sub(r"\b(pl(i|e)*?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)*|^h(e|a)?(l)*(o)*|mal(ayalam)?|t(h)?amil|file|that|find|und(o)*|kit(t(i|y)?)?o(w)?|thar(u)?(o)*w?|kittum(o)*|aya(k)*(um(o)*)?|full\smovie|any(one)|with\ssubtitle(s)?)", "", msg.text, flags=re.IGNORECASE) # plis contribute some common words 
-    query = query.strip() + " movie"
+    query = f"{query.strip()} movie"
     g_s = await search_gagala(query)
     g_s += await search_gagala(msg.text)
     gs_parsed = []
@@ -772,9 +788,8 @@ async def advantage_spell_chok(msg):
     if not gs_parsed:
         reg = re.compile(r"watch(\s[a-zA-Z0-9_\s\-\(\)]*)*\|.*", re.IGNORECASE) # match something like Watch Niram | Amazon Prime 
         for mv in g_s:
-            match  = reg.match(mv)
-            if match:
-                gs_parsed.append(match.group(1))
+            if match := reg.match(mv):
+                gs_parsed.append(match[1])
     user = msg.from_user.id if msg.from_user else 0
     movielist = []
     gs_parsed = list(dict.fromkeys(gs_parsed)) # removing duplicates https://stackoverflow.com/a/7961425

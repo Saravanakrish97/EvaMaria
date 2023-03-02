@@ -41,8 +41,7 @@ class Database:
         return bool(user)
     
     async def total_users_count(self):
-        count = await self.col.count_documents({})
-        return count
+        return await self.col.count_documents({})
     
     async def remove_ban(self, id):
         ban_status = dict(
@@ -64,9 +63,7 @@ class Database:
             ban_reason=''
         )
         user = await self.col.find_one({'id':int(id)})
-        if not user:
-            return default
-        return user.get('ban_status', default)
+        return user.get('ban_status', default) if user else default
 
     async def get_all_users(self):
         return self.col.find({})
@@ -92,10 +89,7 @@ class Database:
 
     async def get_chat(self, chat):
         chat = await self.grp.find_one({'id':int(chat)})
-        if not chat:
-            return False
-        else:
-            return chat.get('chat_status')
+        return chat.get('chat_status') if chat else False
     
 
     async def re_enable_chat(self, id):
@@ -115,8 +109,7 @@ class Database:
     
 
     async def total_chat_count(self):
-        count = await self.grp.count_documents({})
-        return count
+        return await self.grp.count_documents({})
     
 
     async def get_all_chats(self):
