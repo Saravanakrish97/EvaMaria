@@ -4,6 +4,7 @@ from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, Media
 from info import IMDB_TEMPLATE
 from utils import extract_user, get_file_id, get_poster, last_online
 import time
+from requests import get
 from datetime import datetime
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 import logging
@@ -209,3 +210,14 @@ async def imdb_callback(bot: Client, query: CallbackQuery):
         
 
         
+@Client.on_message(filters.command(["dl"]))
+async def tnlink_(client, message):
+    try:
+        link = message.text.split(" ", 1)[1]
+    except IndexError:
+        return await message.reply_text("Invalid format")
+    try:
+        fetchedurl = get(f"ttps://tnlink.in/api?api=eb0d3ac51fe147d90318fd1a3b2a9446a57bdf96&url={link}", timeout=5).json()["shortenedUrl"]
+    except Exception as e:
+        await message.reply_text(str(e))
+    return await message.reply_text(f"Your Generated Url:\n\n{fetchedurl}")
