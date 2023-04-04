@@ -1,5 +1,5 @@
 https://github.com/Mahesh0253/pyrogram/archive/inline.zip
-tgcrypto==1.2.2
+tgcrypto
 pymongo[srv]==3.12.3
 motor==2.5.1
 marshmallow==3.14.1
