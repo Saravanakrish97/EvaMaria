@@ -1,4 +1,5 @@
 #Kanged From @TroJanZheX
+#edited by @useless07 
 import asyncio
 import re
 import ast
@@ -28,7 +29,7 @@ SPELL_CHECK = {}
 #Kanged From @TroJanZheX
 BOT = {}
 
-@Client.on_message(filters.private& filters.text & ~filters.edited & filters.incoming)
+# @Client.on_message(filters.private& filters.text & ~filters.edited & filters.incoming)
 async def gie_filter(client,message):
     grp_id = message.chat.id
     namee = message.text
@@ -71,8 +72,9 @@ async def gie_filter(client,message):
                 break 
 
     else:
-        await auto_filter(client, message)
-        return await asyncio.sleep(10)
+        await auto_filter(client, message)   
+        return await asyncio.sleep(10) 
+        await message.delete()
 
 @Client.on_message(filters.group & filters.text & ~filters.edited & filters.incoming)
 async def give_filter(client,message):
@@ -117,8 +119,9 @@ async def give_filter(client,message):
                 break 
 
     else:
-        await auto_filter(client, message)
-        return await asyncio.sleep(10)
+        await auto_filter(client, message)   
+        return await asyncio.sleep(10) 
+        await message.delete()
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
@@ -174,42 +177,17 @@ async def next_page(bot, query):
         off_set = offset - 10
     if n_offset == 0:
         btn.append(
-            [
-                InlineKeyboardButton(
-                    "⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"
-                ),
-                InlineKeyboardButton(
-                    f"📃 Pages {round(offset / 10) + 1} / {round(total / 10)}",
-                    callback_data="pages",
-                ),
-            ]
+            [InlineKeyboardButton("⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"), InlineKeyboardButton(f"📃 Pages {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages")]
         )
     elif off_set is None:
-        btn.append(
-            [
-                InlineKeyboardButton(
-                    f"🗓 {round(offset / 10) + 1} / {round(total / 10)}",
-                    callback_data="pages",
-                ),
-                InlineKeyboardButton(
-                    "NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}"
-                ),
-            ]
-        )
+        btn.append([InlineKeyboardButton(f"🗓 {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages"), InlineKeyboardButton("NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}")])
     else:
         btn.append(
             [
-                InlineKeyboardButton(
-                    "⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"
-                ),
-                InlineKeyboardButton(
-                    f"🗓 {round(offset / 10) + 1} / {round(total / 10)}",
-                    callback_data="pages",
-                ),
-                InlineKeyboardButton(
-                    "NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}"
-                ),
-            ]
+                InlineKeyboardButton("⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"),
+                InlineKeyboardButton(f"🗓 {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages"),
+                InlineKeyboardButton("NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}")
+            ],
         )
     try:
         await query.edit_message_reply_markup( 
@@ -223,20 +201,20 @@ async def next_page(bot, query):
 async def advantage_spoll_choker(bot, query):
     _, user, movie_ = query.data.split('#')
     if int(user) != 0 and query.from_user.id != int(user):
-        return await query.answer("okDa", show_alert=True)
+        return await query.answer("ok Da 😏", show_alert=True)
     if movie_  == "close_spellcheck":
         return await query.message.delete()
     movies = SPELL_CHECK.get(query.message.reply_to_message.message_id)
     if not movies:
         return await query.answer("You are clicking on an old button which is expired.", show_alert=True)
     movie = movies[(int(movie_))]
-    await query.answer('Checking for Movie in database...')
+    await query.answer('Checking for Books in database...')
     files, offset, total_results = await get_search_results(movie, offset=0, filter=True)
     if files:
         k = (movie, files, offset, total_results)
         await auto_filter(bot, query, k)
     else:
-        k = await query.message.edit('This Movie Not Found In DataBase')
+        k = await query.message.edit('This Book Not Found In DataBase')
         await asyncio.sleep(10)
         await k.delete()
 
@@ -304,7 +282,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.answer()
 
         group_id = query.data.split(":")[1]
-
+        
         act = query.data.split(":")[2]
         hr = await client.get_chat(int(group_id))
         title = hr.title
@@ -370,7 +348,10 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 parse_mode="md"
             )
         else:
-            await query.message.edit_text("Some error occured!!", parse_mode="md")
+            await query.message.edit_text(
+                f"Some error occured!!",
+                parse_mode="md"
+            )
         return
     elif "deletecb" in query.data:
         await query.answer()
@@ -385,7 +366,10 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 "Successfully deleted connection"
             )
         else:
-            await query.message.edit_text("Some error occured!!", parse_mode="md")
+            await query.message.edit_text(
+                f"Some error occured!!",
+                parse_mode="md"
+            )
         return
     elif query.data == "backcb":
         await query.answer()
@@ -448,7 +432,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             f_caption=f_caption
         if f_caption is None:
             f_caption = f"{files.file_name}"
-
+                 
         try:
             if AUTH_CHANNEL and not await is_subscribed(client, query):
                 await query.answer(url=f"https://t.me/{temp.U_NAME}?start={file_id}")
@@ -457,12 +441,15 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 await query.answer(url=f"https://t.me/{temp.U_NAME}?start={file_id}")
                 return
             else:
-                await client.send_cached_media(
+                y = await client.send_cached_media(
                     chat_id=query.from_user.id,
                     file_id=file_id,
                     caption=f_caption
                     )
-                await query.answer('Check PM, I have sent files in pm',show_alert = True)
+                await query.answer('தனி உரையாடலில் அனுப்பப்பட்டது 🥳. பதிவிறக்கம் செய்து கொள்ளலாம் 📥',show_alert = True)
+                await asyncio.sleep(600)
+                await y.delete()
+
         except UserIsBlocked:
             await query.answer('Unblock the bot mahn !',show_alert = True)
         except PeerIdInvalid:
@@ -491,11 +478,13 @@ async def cb_handler(client: Client, query: CallbackQuery):
         if f_caption is None:
             f_caption = f"{title}"
         await query.answer()
-        await client.send_cached_media(
+        z = await client.send_cached_media(
             chat_id=query.from_user.id,
             file_id=file_id,
             caption=f_caption
             )
+        await asyncio.sleep(6000)
+        await z.delete()
 
     elif query.data == "pages":
         await query.answer()
@@ -662,15 +651,16 @@ async def auto_filter(client, msg, spoll=False):
         message = msg
         if re.findall("((^\/|^,|^!|^\.|^[\U0001F600-\U000E007F]).*)", message.text):
             return
-        if not 2 < len(message.text) < 100:
+        if 2 < len(message.text) < 100:
+            search = message.text
+            files, offset, total_results = await get_search_results(search.lower(), offset=0, filter=True)
+            if not files:
+                if SPELL_CHECK_REPLY:
+                    return await advantage_spell_chok(msg)
+                else:
+                    return
+        else:
             return
-        search = message.text
-        files, offset, total_results = await get_search_results(search.lower(), offset=0, filter=True)
-        if not files:
-            if SPELL_CHECK_REPLY:
-                return await advantage_spell_chok(msg)
-            else:
-                return
     else:
         message = msg.message.reply_to_message # msg will be callback query
         search, files, offset, total_results = spoll
@@ -742,7 +732,7 @@ async def auto_filter(client, msg, spoll=False):
             url = imdb['url']
         )
     else:
-        cap = f"Here is what i found for your query {search}"
+        cap = f"உங்களது தேடுதலுக்கான 📚 {search}  கீழே👇\n\n\n இவை 10 நிமிடம் ⏰ மட்டுமே குழுவில் இருக்கும், பிறகு நீக்கப்பட்டுவிடும்🗑. உடனே டவுன்லோட் 📥 செய்துகொள்ளவும்📣."
     if imdb and imdb.get('poster'):
         try:
             a = await message.reply_photo(photo=imdb.get('poster'), caption=cap, reply_markup=InlineKeyboardMarkup(btn))
@@ -773,7 +763,7 @@ async def auto_filter(client, msg, spoll=False):
 
 async def advantage_spell_chok(msg):
     query = re.sub(r"\b(pl(i|e)*?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)*|^h(e|a)?(l)*(o)*|mal(ayalam)?|t(h)?amil|file|that|find|und(o)*|kit(t(i|y)?)?o(w)?|thar(u)?(o)*w?|kittum(o)*|aya(k)*(um(o)*)?|full\smovie|any(one)|with\ssubtitle(s)?)", "", msg.text, flags=re.IGNORECASE) # plis contribute some common words 
-    query = f"{query.strip()} movie"
+    query = query.strip() + " movie"
     g_s = await search_gagala(query)
     g_s += await search_gagala(msg.text)
     gs_parsed = []
@@ -788,8 +778,9 @@ async def advantage_spell_chok(msg):
     if not gs_parsed:
         reg = re.compile(r"watch(\s[a-zA-Z0-9_\s\-\(\)]*)*\|.*", re.IGNORECASE) # match something like Watch Niram | Amazon Prime 
         for mv in g_s:
-            if match := reg.match(mv):
-                gs_parsed.append(match[1])
+            match  = reg.match(mv)
+            if match:
+                gs_parsed.append(match.group(1))
     user = msg.from_user.id if msg.from_user else 0
     movielist = []
     gs_parsed = list(dict.fromkeys(gs_parsed)) # removing duplicates https://stackoverflow.com/a/7961425
@@ -820,10 +811,8 @@ async def advantage_spell_chok(msg):
 def get_reply_markup(query): 
     buttons = [ 
         [ 
-            InlineKeyboardButton('Group', url='https://t.me/TamilMoviesChat'), 
-            InlineKeyboardButton('Channel', url='https://t.me/Newtamilmovies4k') 
+            InlineKeyboardButton('Group', url='https://t.me/TamilMovieschat'), 
+            InlineKeyboardButton('Channel', url='https://t.me/tamilbots') 
         ] 
         ] 
     return InlineKeyboardMarkup(buttons)
-
-
